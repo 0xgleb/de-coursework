@@ -1,4 +1,3 @@
-
 #+LATEX_HEADER: \usepackage[margin=1.5cm,includefoot]{geometry}
 #+LATEX_HEADER: \usepackage[none]{hyphenat}
 #+LATEX_HEADER: \usepackage{array}
@@ -22,6 +21,109 @@
 
 \newpage
 
-\tableofcontents
+# \tableofcontents
 
 \newpage
+
+* Simplifying situation and setting up the model
+** Given data
+
+I've been given data about a landing aeroplane after touchdown. The mass of the aeroplane is $120 000$ kg. Initially air resistance slows the aeroplane and then, when it is slow enough, wheel brakes add a constant force to fully stop the aeroplane. The table below shows the aeroplane's speed, $v$ ms^{-1}, $t$ seconds after touchdown.
+
+#+ATTR_LATEX: :align |rl|rl|
+|----+----+----+----|
+|  t |  v |  t |  v |
+|----+----+----+----|
+|  0 | 96 | 14 | 34 |
+|  1 | 89 | 15 | 31 |
+|  2 | 82 | 16 | 27 |
+|  3 | 77 | 17 | 24 |
+|  4 | 72 | 18 | 21 |
+|  5 | 68 | 19 | 18 |
+|  6 | 64 | 20 | 16 |
+|  7 | 61 | 21 | 13 |
+|  8 | 58 | 22 | 10 |
+|  9 | 55 | 23 |  8 |
+| 10 | 50 | 24 |  5 |
+| 11 | 46 | 25 |  3 |
+| 12 | 41 | 26 |  0 |
+| 13 | 38 |    |    |
+|----+----+----+----|
+
+The image below shows a chart of the original data.
+
+#+NAME: original_graph
+[[./original_graph.png]]
+
+** Modeling assumptions
+
+- *The aeroplane can be modeled as a point particle*. This assumption allows us to negate any complex resistances that would occur. Modeling this way is appropriate because we are not given velocity (only speed) of the aeroplane at different points in time, so we are not interested in any rotations of the plane.
+- *The runway can be modeled as a plane*. Without this assumption we would need to consider the possibility that the runway has a complex shape, for example it can have hills and/or pits.
+- *The runway is horizontal*. Without this assumption we would need to include components of the weight and the reaction force in the model which would increase the complexity of the model and affect the calculations.
+- *The aeroplane is moving in the horizontal plane*. This assumption allows us to negate any vertical forces.
+- *The constant force from the wheel breaks (after the breaks are applied) and the air resistance are the only forces acting on the aeroplane in the horizontal plane*. This assumption allows us to say that any other resistance is negligible and there are no other forces, alternatively we can say that the air resistance model is a model of the total resistance force.
+- *The given values for speed are rounded to the nearest integer*. This assumption allows the model of speed to have an error $\pm0.5$. It's very unlikely that the values of speed are exactly integers, so it's a reasonable assumption.
+- *Breaks are applied at $t = 9$*. The table below shows differences between consecutive speed values, $\Delta v$, and differences between consecutive differences, $\Delta (\Delta v)$. $\Delta (\Delta v)$ is the lowest when $t = 10$. This means that the highest decrease of acceleration occurred between $t = 9$ and $t = 10$, hence we will assume that the breaks were applied during that time. We will model this as if the breaks were applied at $t = 9$.
+- *Braking force starts working instantly*. This assumption makes acceleration not continuous and simplifies the calculations.
+
+#+ATTR_LATEX: :mode math :environment bmatrix
+#+NAME: table_of_differences
+|----+----+----------+-------------------|
+|  t |  v | \Delta v | \Delta (\Delta v) |
+|----+----+----------+-------------------|
+|  0 | 96 |          |                   |
+|  1 | 89 |       -7 |                   |
+|  2 | 82 |       -7 |                 0 |
+|  3 | 77 |       -5 |                 2 |
+|  4 | 72 |       -5 |                 0 |
+|  5 | 68 |       -4 |                 1 |
+|  6 | 64 |       -4 |                 0 |
+|  7 | 61 |       -3 |                 1 |
+|  8 | 58 |       -3 |                 0 |
+|  9 | 55 |       -3 |                 0 |
+| 10 | 50 |       -5 |                -2 |
+| 11 | 46 |       -4 |                 1 |
+| 12 | 41 |       -5 |                -1 |
+| 13 | 38 |       -3 |                 2 |
+| 14 | 34 |       -4 |                -1 |
+| 15 | 31 |       -3 |                 1 |
+| 16 | 27 |       -4 |                -1 |
+| 17 | 24 |       -3 |                 1 |
+| 18 | 21 |       -3 |                 0 |
+| 19 | 18 |       -3 |                 0 |
+| 20 | 16 |       -2 |                 1 |
+| 21 | 13 |       -3 |                -1 |
+| 22 | 10 |       -3 |                 0 |
+| 23 |  8 |       -2 |                 1 |
+| 24 |  5 |       -3 |                -1 |
+| 25 |  3 |       -2 |                 1 |
+| 26 |  0 |       -3 |                -1 |
+|----+----+----------+-------------------|
+
+** Derivation of the initial model
+
+#+CAPTION: Forces diagram
+[[./plane_diagram.png]]
+
+The diagram shows the x-axis, direction of velocity, $v$, the air resistance, $f(v)$, and the constant braking force (when breaks are used), $B$.
+
+$$ F = ma \mbox{ (Newton's second law)} $$
+$$ F = \begin{cases} - f(v), & t < 9 \\ - f(v) - B, & t \geq 9 \end{cases} $$
+$$ a = \dot{v} $$
+$$ \Rightarrow \begin{cases} m\dot{v} = - f(v), & t < 9 \\ m\dot{v} = - f(v) - B, & t \geq 9 \end{cases} $$
+$$ \mbox{where } m = 120 000 $$
+
+* Manipulating the model
+** Defining f(v)
+
+As you can see in [[table_of_differences]] speed for $t \in (0, 9)$ clearly isn't decreasing linearly. And you can see that, as speed decreases (in that interval), the rate at which it decreases also decreases. So it's reasonable to suggest that
+
+$$ f(v) \propto v^2 $$
+$$ \Rightarrow f(v) = kv^2 $$
+$$ \Rightarrow m\dot{v} = \begin{cases} - kv^2, & t < 9 \\ - kv^2 - B, & 9 \geq t \leq 26 \end{cases} $$
+
+** General solution
+* The collection of data to verify the model
+* Comparison between the data collected and the predictions of the model
+* Revision of the model
+* Assessment of the improvement obtained
