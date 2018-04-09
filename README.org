@@ -1,0 +1,27 @@
+
+#+LATEX_HEADER: \usepackage[margin=1.5cm,includefoot]{geometry}
+#+LATEX_HEADER: \usepackage[none]{hyphenat}
+#+LATEX_HEADER: \usepackage{array}
+#+LATEX_HEADER: \newcolumntype{$}{>{\global\let\currentrowstyle\relax}}
+#+LATEX_HEADER: \newcolumntype{^}{>{\currentrowstyle}}
+#+LATEX_HEADER: \newcommand{\rowstyle}[1]{\gdef\currentrowstyle{#1} #1\ignorespaces}
+#+LATEX_HEADER: \usepackage{indentfirst}
+
+#+OPTIONS: toc:nil title:nil
+
+\begin{titlepage}
+  \begin{center}
+    \line(1,0){300} \\
+    [5mm]
+    \huge{\bfseries Differential Equations Coursework} \\
+    \huge{\bfseries Aeroplane Landing Modelling} \\
+    [5mm]
+    \huge{Gleb Dianov} \\
+  \end{center}
+\end{titlepage}
+
+\newpage
+
+\tableofcontents
+
+\newpage
