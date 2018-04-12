@@ -108,7 +108,7 @@ The image below shows a chart of the original data.
 The diagram shows the x-axis, direction of velocity, $v$, the air resistance, $f(v)$, and the constant braking force (when breaks are used), $B$.
 
 $$ F = ma \mbox{ (Newton's second law)} $$
-$$ F = \begin{cases} - f(v), & t < 9 \\ - f(v) - B, & t \geq 9 \end{cases} $$
+$$ F = \begin{cases} - f(v), & 0 \leq t < 9 \\ - f(v) - B, & 9 \leq t \leq 26 \end{cases} $$
 $$ a = \dot{v} $$
 $$ \Rightarrow \begin{cases} m\dot{v} = - f(v), & t < 9 \\ m\dot{v} = - f(v) - B, & t \geq 9 \end{cases} $$
 $$ \mbox{where } m = 120 000 $$
@@ -120,9 +120,55 @@ As you can see in [[table_of_differences]] speed for $t \in (0, 9)$ clearly isn'
 
 $$ f(v) \propto v^2 $$
 $$ \Rightarrow f(v) = kv^2 $$
-$$ \Rightarrow m\dot{v} = \begin{cases} - kv^2, & t < 9 \\ - kv^2 - B, & 9 \geq t \leq 26 \end{cases} $$
+$$ \Rightarrow m\dot{v} = \begin{cases} - kv^2, & 0 \leq t < 9 \\ - kv^2 - B, & 9 \leq t \leq 26 \end{cases} $$
 
 ** General solution
+*** 0 \leq t < 9
+
+$$ m\dot{v} = -kv^2 $$
+$$ m\frac{\dot{v}}{v^2} = -k $$
+$$ m\int \frac{\dot{v}}{v^2} dt = -k\int dt $$
+$$ m\int v^{-2} dv = -kt + c $$
+$$ m\frac{v^{-1}}{-1} = -kt + c $$
+$$ \frac{-m}{v} = -kt + c $$
+$$ v = \frac{m}{kt - c} $$
+
+*** 9 \leq t \leq 26
+
+$$ m\dot{v} = -kv^2 - B $$
+$$ m\frac{\dot{v}}{kv^2 + B} = -1 $$
+$$ m\int \frac{\dot{v}}{kv^2 + B} dt = -\int dt $$
+$$ m\int \frac{1}{kv^2 + B} dv = -\int dt $$
+$$ \arctan'(\psi) = \frac{1}{\psi^2 + 1} $$
+$$ \Rightarrow \arctan'(\frac{a}{b}\psi) = \frac{a}{b} \times \frac{1}{(\frac{a}{b}\psi)^2 + 1} = \frac{a}{b} \times \frac{b^2}{a^2\psi^2 + b^2} = \frac{ab}{a^2\psi^2 + b^2} $$
+$$ \Rightarrow \arctan'(\sqrt{\frac{a}{b}}\psi) = \frac{\sqrt{ab}}{a\psi^2 + b} $$
+$$ \Rightarrow \int \frac{1}{kv^2 + B} dv = \frac{1}{\sqrt{kB}}\int \frac{\sqrt{kB}}{kv^2 + B} = \frac{\arctan(\sqrt{\frac{k}{B}}v)}{\sqrt{kB}} + c $$
+$$ \Rightarrow \frac{m\arctan(\sqrt{\frac{k}{B}}v)}{\sqrt{kB}} = -t + c $$
+$$ \Rightarrow \sqrt{\frac{k}{B}}v = \tan \frac{\sqrt{kB}(-t + c)}{m} $$
+$$ \Rightarrow v = \sqrt{\frac{B}{k}} \tan \frac{\sqrt{kB}(-t + c)}{m} $$
+$$ \mbox{Let } c_1 = \sqrt{kB}c $$
+$$ \Rightarrow v = \sqrt{\frac{B}{k}} \tan \frac{c_1 -\sqrt{kB}t}{m} $$
+
+** Particular solution
+
+To make $v$ continuous I will use point $(t = 9, v = 55)$.
+
+$$ \begin{cases} \sqrt{\frac{B}{k}} \tan \frac{c_2 - 9\sqrt{kB}}{m} = 55 \\ \frac{m}{9k - c_1} = 55 \end{cases} $$
+$$ \Rightarrow 9k - c_1 = \frac{m}{55} $$
+$$ \Rightarrow k = \frac{c_1 + \frac{m}{55}}{9} $$
+$$ S \mbox{ is the set of given data.} $$
+$$ (t_1, v_1), (t_2, v_2) \in S; t_1, t_2 \leq 9, t_1 \neq t_2 $$
+$$ \begin{cases} v_1 = \frac{m}{t_1k - c_1} \\ v_2 = \frac{m}{t_2k - c_1} \end{cases} $$
+$$ \Rightarrow \begin{cases} v_1v_2t_2t_1k - v_1v_2t_2c_1 = mv_2t_2 \\ v_1v_2t_1t_2k  - v_1v_2t_1c_1 = mv_1t_1 \end{cases} $$
+$$ \Rightarrow c_1v_1v_2(t_2 - t_1) = m(v_1t_1 - v_2t_2) $$
+$$ \Rightarrow c_1 = \frac{m(v_1t_1 - v_2t_2)}{v_1v_2(t_2 - t_1)} $$
+$$ \sqrt{\frac{B}{k}} \tan \frac{c_2 - 9\sqrt{kB}}{m} = 55 $$
+$$ \Rightarrow c_2(B) = m\arctan(\frac{55k\sqrt{\frac{B}{k}}}{B}) + 9\sqrt{Bk} $$
+$$ \Rightarrow v = \sqrt{\frac{B}{k}} \tan \frac{c_2(B) - \sqrt{kB}t}{m} $$
+$$ \Rightarrow v\sqrt{\frac{k}{B}} = \tan \frac{c_2(B) - \sqrt{kB}t}{m} $$
+$$ \mbox{Let } \lambda(B) = v\sqrt{\frac{k}{B}} - \tan \frac{c_2(B) - \sqrt{kB}t}{m} $$
+$$  $$
+
 * The collection of data to verify the model
 * Comparison between the data collected and the predictions of the model
 * Revision of the model
