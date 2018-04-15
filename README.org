@@ -172,9 +172,41 @@ $$ \mbox{Newton-Raphson's rule: } B_{n+1} = B_n + \frac{\lambda'(B_n)}{\lambda(B
 $$ c_1 = \frac{m(v_1t_1 - v_2t_2)}{v_1v_2(t_2 - t_1)} $$
 $$ k = \frac{c_1 + \frac{m}{55}}{9} $$
 $$ c_2(B) = m\arctan(\frac{55k\sqrt{\frac{B}{k}}}{B}) + 9\sqrt{Bk} $$
-$$ B_{n+1} = B_n + \frac{\lambda'(B_n)}{\lambda(B_n)} $$
+$$ B_{n+1} = B_n - \frac{\lambda(B_n)}{\lambda'(B_n)} $$
 
 * The collection of data to verify the model
 * Comparison between the data collected and the predictions of the model
 * Revision of the model
+** General solution
+*** 9 < t \leq 26
+
+$$ m\dot{v} = -kv^2 - \lambda v - W $$
+$$ \Rightarrow m\int \frac{1}{kv^2 + \lambda v + W} dv = -\int dt $$
+$$ kv^2 + \lambda v + W = (\sqrt{k}v + \frac{\lambda}{2\sqrt{k}})^2 + W - \frac{\lambda^2}{4k} = (W - \frac{\lambda^2}{4k})((\frac{\sqrt{k}v + \frac{\lambda}{2\sqrt{k}}}{\sqrt{W - \frac{\lambda^2}{4k}}})^2 + 1) = (W - \frac{\lambda^2}{4k})((\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}})^2 + 1) $$
+$$ \mbox{Let } h(x) = \frac{2kx + \lambda}{\sqrt{4kW - \lambda^2}} $$
+$$ \Rightarrow h'(x) = \frac{2k}{\sqrt{4kW - \lambda^2}} $$
+$$ \arctan'(x) = \frac{1}{1 + x^2} $$
+$$ \Rightarrow (\arctan(h(x)))' = \arctan'(h(x))h'(x) = \frac{1}{h^2(x) + 1}h'(x) = \frac{\frac{2k}{\sqrt{4kW - \lambda^2}}}{(\frac{2kx + \lambda}{\sqrt{4kW - \lambda^2}})^2 + 1} $$
+$$ \Rightarrow m\int \frac{1}{kv^2 + \lambda v + W} dv = m\int \frac{1}{(W - \frac{\lambda^2}{4k})((\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}})^2 + 1)} dv = \frac{2m\sqrt{4kW - \lambda^2}}{4k(W - \frac{\lambda^2}{4k})}\int \frac{\frac{2k}{\sqrt{4kW - \lambda^2}}}{(\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}})^2 + 1} dv $$
+$$ \Rightarrow \frac{2m}{\sqrt{4kW-\lambda^2}}\arctan(\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}}) = -t + c_4 $$
+$$ \Rightarrow \frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}} = \tan(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t)) $$
+$$ \Rightarrow v = \frac{\sqrt{4kW - \lambda^2}\tan(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t)) - \lambda}{2k}  $$
+
+*** 0 \leq t < 9
+
+$$ m\dot{v} = -kv^2 - \lambda v $$
+$$ \Rightarrow m\int \frac{1}{kv^2 + \lambda v} dv = -t + c_3 $$
+$$ kv^2 + \lambda v \equiv v(kv + \lambda)  $$
+$$ \frac{1}{v(kv + \lambda)} \equiv \frac{A}{v} + \frac{B}{kv + \lambda} $$
+$$ \Rightarrow 1 \equiv A(kv + \lambda) + Bv $$
+$$ \Rightarrow \begin{cases} A = \frac{1}{\lambda} \\ B = -\frac{k}{\lambda} \end{cases} $$
+$$ \Rightarrow \frac{1}{kv^2 + \lambda v} \equiv \frac{1}{\lambda v} - \frac{k}{k \lambda v + \lambda^2} ( \equiv \frac{k \lambda v + \lambda^2 - k \lambda v}{\lambda v (k \lambda v + \lambda^2)} \equiv \frac{\lambda^2}{\lambda^2(kv^2 + \lambda v)} \equiv \frac{1}{kv^2 + \lambda v} ) $$
+$$ \Rightarrow \int \frac{1}{kv^2 - \lambda v} dv = \frac{1}{\lambda}\int v^{-1} dv - \frac{1}{\lambda}\int \frac{k}{kv + \lambda} dv $$
+$$ \Rightarrow \frac{m}{\lambda}(\ln(v) - \ln(kv + \lambda)) = c_3 - t $$
+$$ \Rightarrow \ln(\frac{v}{kv + \lambda}) = \frac{\lambda}{m} (c_3 - t) $$
+$$ \Rightarrow \frac{v}{kv + \lambda} = e^{\frac{\lambda}{m} (c_3 - t)} $$
+$$ \Rightarrow v = k e^{\frac{\lambda}{m} (c_3 - t)} v + \lambda e^{\frac{\lambda}{m} (c_3 - t)} $$
+$$ v = \frac{\lambda e^{\frac{\lambda}{m} (c_3 - t)}}{1 - k e^{\frac{\lambda}{m} (c_3 - t)}} $$
+$$ v = \frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{\frac{\lambda}{m} t} - ke^{\frac{\lambda}{m}c_3}} $$
+
 * Assessment of the improvement obtained
