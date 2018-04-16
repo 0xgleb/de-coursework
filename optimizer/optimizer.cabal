@@ -1,0 +1,51 @@
+-- This file has been generated from package.yaml by hpack version 0.20.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 070d061f2f23394142ca65c81a8181516e39d66843cf38e1f831e8e156c61163
+
+name:           optimizer
+version:        0.1.0.0
+description:    Please see the README on Github at <https://github.com/githubuser/optimizer#readme>
+homepage:       https://github.com/githubuser/optimizer#readme
+bug-reports:    https://github.com/githubuser/optimizer/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2018 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+
+extra-source-files:
+    ChangeLog.md
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/optimizer
+
+library
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  exposed-modules: AutoDiff
+                 , GivenData
+                 , FirstModel
+                 , SecondModel
+  other-modules:
+      Paths_optimizer
+  default-language: Haskell2010
+
+executable optimizer-exe
+  main-is: Main.hs
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -O2
+  build-depends:
+      base >=4.7 && <5
+    , optimizer
+  other-modules:
+      Paths_optimizer
+  default-language: Haskell2010
