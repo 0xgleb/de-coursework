@@ -45,3 +45,7 @@ predictSpeed Parameters{..} t
   | 0 <= t && t <= 9  = m / (k * t - c1)
   | 9 <  t && t <= 26 = sqrt (b / k) * tan ((c2 - sqrt (k * b) * t) / m)
   | otherwise = error "Invalid time!"
+
+
+combinations :: (Enum a, Num a, Eq a) => [(Point a, Point a, Point a)]
+combinations = zipWith (\p3 (p1, p2) -> (p1, p2, p3)) (drop 10 points) $ filter (uncurry (/=)) $ (\l -> [ (p1, p2) | p1 <- l, p2 <- l ]) $ take 10 points

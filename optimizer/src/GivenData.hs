@@ -20,6 +20,3 @@ m = 120000
 
 toDualPoint :: Num a => Point a -> Point (Dual a)
 toDualPoint Point{..} = Point (constDual pTime) (constDual pSpeed)
-
-combinations :: (Enum a, Num a, Eq a) => [(Point a, Point a, Point a)]
-combinations = zipWith (\p3 (p1, p2) -> (p1, p2, p3)) (drop 10 points) $ filter (uncurry (/=)) $ (\l -> [ (p1, p2) | p1 <- l, p2 <- l ]) $ take 10 points
