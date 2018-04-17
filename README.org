@@ -164,10 +164,15 @@ $$ \Rightarrow c_1v_1v_2(t_2 - t_1) = m(v_1t_1 - v_2t_2) $$
 $$ \Rightarrow c_1 = \frac{m(v_1t_1 - v_2t_2)}{v_1v_2(t_2 - t_1)} $$
 $$ \sqrt{\frac{B}{k}} \tan \frac{c_2 - 9\sqrt{kB}}{m} = 55 $$
 $$ \Rightarrow c_2(B) = m\arctan(\frac{55k\sqrt{\frac{B}{k}}}{B}) + 9\sqrt{Bk} $$
-$$ \Rightarrow v = \sqrt{\frac{B}{k}} \tan \frac{c_2(B) - \sqrt{kB}t}{m} $$
-$$ \Rightarrow v\sqrt{\frac{k}{B}} = \tan \frac{c_2(B) - \sqrt{kB}t}{m} $$
-$$ \mbox{Let } \lambda(B) = v\sqrt{\frac{k}{B}} - \tan \frac{c_2(B) - \sqrt{kB}t}{m} $$
-$$  $$
+$$ (t_3, v_3) \in S; t_3 > 9 $$
+$$ \Rightarrow v_3 = \sqrt{\frac{B}{k}} \tan \frac{c_2(B) - \sqrt{kB}t_3}{m} $$
+$$ \Rightarrow \arctan(v_3\sqrt{\frac{k}{B}}) = \frac{c_2(B) - \sqrt{kB}t_3}{m} $$
+$$ \mbox{Let } \lambda(B) = \frac{c_2(B) - \sqrt{kB}t_3}{m} - \arctan(v_3\sqrt{\frac{k}{B}}) $$
+$$ \mbox{Newton-Raphson's rule: } B_{n+1} = B_n + \frac{\lambda'(B_n)}{\lambda(B_n)} $$
+$$ c_1 = \frac{m(v_1t_1 - v_2t_2)}{v_1v_2(t_2 - t_1)} $$
+$$ k = \frac{c_1 + \frac{m}{55}}{9} $$
+$$ c_2(B) = m\arctan(\frac{55k\sqrt{\frac{B}{k}}}{B}) + 9\sqrt{Bk} $$
+$$ B_{n+1} = B_n + \frac{\lambda'(B_n)}{\lambda(B_n)} $$
 
 * The collection of data to verify the model
 * Comparison between the data collected and the predictions of the model
