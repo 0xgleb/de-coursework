@@ -107,6 +107,14 @@ findParams () = parameters
           , pC4 = c4F (pC3 parameters) (pK parameters) (pLambda parameters) (pW parameters)
           }
 
+initParams :: Num a => Parameters a
+initParams =
+  Parameters { pLambda = 700
+             , pC3 = -21030
+             , pK = 103
+             , pW = 300000
+             , pC4 = 25
+             }
 
 predict :: (Ord a, Floating a) => Parameters a -> a -> a
 predict Parameters{..} t
