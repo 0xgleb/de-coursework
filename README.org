@@ -65,6 +65,7 @@ The image below shows a chart of the original data.
 - *The given values for speed are rounded to the nearest integer*. This assumption allows the model of speed to have an error $\pm0.5$. It's very unlikely that the values of speed are exactly integers, so it's a reasonable assumption.
 - *Breaks are applied at $t = 9$*. The table below shows differences between consecutive speed values, $\Delta v$, and differences between consecutive differences, $\Delta (\Delta v)$. $\Delta (\Delta v)$ is the lowest when $t = 10$. This means that the highest decrease of acceleration occurred between $t = 9$ and $t = 10$, hence we will assume that the breaks were applied during that time. We will model this as if the breaks were applied at $t = 9$.
 - *Braking force starts working instantly*. This assumption makes acceleration not continuous and simplifies the calculations.
+- *There is no wind*. This allows us to assume that if the plane is not moving then there is no air resistance.
 
 #+ATTR_LATEX: :mode math :environment bmatrix
 #+NAME: table_of_differences
@@ -113,7 +114,7 @@ $$ a = \dot{v} $$
 $$ \Rightarrow \begin{cases} m\dot{v} = - f(v), & t < 9 \\ m\dot{v} = - f(v) - B, & t \geq 9 \end{cases} $$
 $$ \mbox{where } m = 120 000 $$
 
-* Manipulating the model
+* Model 1
 ** Defining f(v)
 
 As you can see in [[table_of_differences]] speed for $t \in (0, 9)$ clearly isn't decreasing linearly. And you can see that, as speed decreases (in that interval), the rate at which it decreases also decreases. So it's reasonable to suggest that
@@ -122,16 +123,20 @@ $$ f(v) \propto v^2 $$
 $$ \Rightarrow f(v) = kv^2 $$
 $$ \Rightarrow m\dot{v} = \begin{cases} - kv^2, & 0 \leq t < 9 \\ - kv^2 - B, & 9 \leq t \leq 26 \end{cases} $$
 
+To make $v$ continuous I will assume that both models are valid for $t = 9$.
+
+$$ m\dot{v} = \begin{cases} - kv^2, & 0 \leq t \leq 9 \\ - kv^2 - B, & 9 \leq t \leq 26 \end{cases} $$
+
 ** General solution
-*** 0 \leq t < 9
+*** 0 \leq t \leq 9
 
 $$ m\dot{v} = -kv^2 $$
-$$ m\frac{\dot{v}}{v^2} = -k $$
-$$ m\int \frac{\dot{v}}{v^2} dt = -k\int dt $$
-$$ m\int v^{-2} dv = -kt + c $$
-$$ m\frac{v^{-1}}{-1} = -kt + c $$
-$$ \frac{-m}{v} = -kt + c $$
-$$ v = \frac{m}{kt - c} $$
+$$ \Rightarrow m\frac{\dot{v}}{v^2} = -k $$
+$$ \Rightarrow m\int \frac{\dot{v}}{v^2} dt = -k\int dt $$
+$$ \Rightarrow m\int v^{-2} dv = -kt + c_1 $$
+$$ \Rightarrow m\frac{v^{-1}}{-1} = -kt + c_1 $$
+$$ \Rightarrow \frac{-m}{v} = -kt + c_1 $$
+$$ \Rightarrow v = \frac{m}{kt - c_1} $$
 
 *** 9 \leq t \leq 26
 
@@ -146,14 +151,15 @@ $$ \Rightarrow \int \frac{1}{kv^2 + B} dv = \frac{1}{\sqrt{kB}}\int \frac{\sqrt{
 $$ \Rightarrow \frac{m\arctan(\sqrt{\frac{k}{B}}v)}{\sqrt{kB}} = -t + c $$
 $$ \Rightarrow \sqrt{\frac{k}{B}}v = \tan \frac{\sqrt{kB}(-t + c)}{m} $$
 $$ \Rightarrow v = \sqrt{\frac{B}{k}} \tan \frac{\sqrt{kB}(-t + c)}{m} $$
-$$ \mbox{Let } c_1 = \sqrt{kB}c $$
-$$ \Rightarrow v = \sqrt{\frac{B}{k}} \tan \frac{c_1 -\sqrt{kB}t}{m} $$
+$$ \mbox{Let } c_2 = \sqrt{kB}c $$
+$$ \Rightarrow v = \sqrt{\frac{B}{k}} \tan(\frac{c_2 -\sqrt{kB}t}{m})$$
+$$ \Rightarrow v = \begin{cases} \frac{m}{kt - c_1}, & 0 \leq t \leq 9 \\ \sqrt{\frac{B}{k}} \tan(\frac{c_2 -\sqrt{kB}t}{m}), & 9 \leq t \leq 26 \end{cases} $$
 
 ** Particular solution
 
-To make $v$ continuous I will use point $(t = 9, v = 55)$.
+The general solution has 4 unknown constants: the constant braking force, $B$, the coefficient from the air resistance model, $k$, and 2 constants of integration from solving the 2 differential equations, $c_1$ and $c_2$. To make $v$ continuous I will use point $(t = 9, v = 55)$.
 
-$$ \begin{cases} \sqrt{\frac{B}{k}} \tan \frac{c_2 - 9\sqrt{kB}}{m} = 55 \\ \frac{m}{9k - c_1} = 55 \end{cases} $$
+$$ \begin{cases} \frac{m}{9k - c_1} = 55 \\ \sqrt{\frac{B}{k}} \tan \frac{c_2 - 9\sqrt{kB}}{m} = 55 \end{cases} $$
 $$ \Rightarrow 9k - c_1 = \frac{m}{55} $$
 $$ \Rightarrow k = \frac{c_1 + \frac{m}{55}}{9} $$
 $$ S \mbox{ is the set of given data.} $$
@@ -169,14 +175,102 @@ $$ \Rightarrow v_3 = \sqrt{\frac{B}{k}} \tan \frac{c_2(B) - \sqrt{kB}t_3}{m} $$
 $$ \Rightarrow \arctan(v_3\sqrt{\frac{k}{B}}) = \frac{c_2(B) - \sqrt{kB}t_3}{m} $$
 $$ \mbox{Let } \lambda(B) = \frac{c_2(B) - \sqrt{kB}t_3}{m} - \arctan(v_3\sqrt{\frac{k}{B}}) $$
 $$ \mbox{Newton-Raphson's rule: } B_{n+1} = B_n + \frac{\lambda'(B_n)}{\lambda(B_n)} $$
-$$ c_1 = \frac{m(v_1t_1 - v_2t_2)}{v_1v_2(t_2 - t_1)} $$
-$$ k = \frac{c_1 + \frac{m}{55}}{9} $$
-$$ c_2(B) = m\arctan(\frac{55k\sqrt{\frac{B}{k}}}{B}) + 9\sqrt{Bk} $$
-$$ B_{n+1} = B_n - \frac{\lambda(B_n)}{\lambda'(B_n)} $$
+\begin{equation}
+  \begin{cases}
+    c_1 = \frac{m(v_1t_1 - v_2t_2)}{v_1v_2(t_2 - t_1)} \\
+    k = \frac{c_1 + \frac{m}{55}}{9} \\
+    c_2(B) = m\arctan(\frac{55k\sqrt{\frac{B}{k}}}{B}) + 9\sqrt{Bk} \\
+    \lambda(B) = \frac{c_2(B) - \sqrt{kB}t_3}{m} - \arctan(v_3\sqrt{\frac{k}{B}}) \\
+    B_{n+1} = B_n - \frac{\lambda(B_n)}{\lambda'(B_n)}
+    B_0 = 300000
+  \end{cases}
+\end{equation}
 
-* The collection of data to verify the model
-* Comparison between the data collected and the predictions of the model
-* Revision of the model
+To find $B_0$ I used a graphing web app. First I put in all the formulas and given data points. $v(0) = \frac{m}{- c_1} > 0$, hence $c_1 < 0$. I started decreasing $c_1$ until it roughly matched first 10 points. $B > 0$, so for this value of $c_1$ I started increasing $B$ until I found that $B \approx 300,000$.
+
+[[./img/not_optimized_first_model.png]]
+
+Now I can use programming to find the parameters. To do this I wrote 4 modules in Haskell. The first module is a module for automatic differentiation using dual numbers and Newton-Raphson method.
+
+#+INCLUDE: "./optimizer/src/AutoDiff.hs" src haskell
+
+The second module contains the given data.
+
+#+INCLUDE: "./optimizer/src/GivenData.hs" src haskell
+
+The third module is for the first model and finding parameters.
+
+#+INCLUDE: "./optimizer/src/FirstModel.hs" src haskell
+
+And finally the main module, which runs this code to find the parameters.
+
+#+BEGIN_SRC haskell
+import           Data.List  (sortOn)
+import qualified FirstModel as Model
+import           GivenData
+
+quadraticError :: (a -> Double -> Double) -> a -> Double
+quadraticError predict params = (/ fromIntegral (length points)) $ sum
+                              $ ((^2) . \(Point t v) -> predict params t - v) <$> points
+
+showResults :: Model.Parameters Double -> String
+showResults params = show params
+                  ++ "\n"
+                  ++ show (quadraticError Model.predict params)
+                  ++ "\n"
+                  ++ foldMap ( (++ "\n")
+                             . show
+                             . (\(t, v', v)->(t, v', round v', v))
+                             . (\(Point t v) -> (t, Model.predict params t, v))
+                             ) points
+
+params :: [Model.Parameters Double]
+params = sortOn (quadraticError Model.predict) $ Model.findParams <$> Model.combinations
+
+main :: IO ()
+main = putStrLn $ showResults (head params) ++ showResults (last params)
+#+END_SRC
+
+Here is the result. It shows the best and the worst parameters found using the derived formulas and for both of the configurations it shows sums of squares of errors, and predictions for each of the given point with rounded versions.
+
+#+NAME: first_model_code_result
+[[./img/first_model_code_result.png]]
+
+** Graphs and Analysis
+
+I'll now look at the two configurations that I obtained and plot them. The red line shows the worst configuration, and the purple line shows the best configuration.
+
+[[./img/first_model_graph_result.png]]
+
+As you can see in [[first_model_code_result]] rounded predictions of the best configuration exactly match the given data.
+
+** Conclusion of Model 1
+
+\begin{equation}
+  \begin{cases}
+    v(t) = \frac{m}{kt - c_1}, & 0 \leq t \leq 9 \\
+    v(t) = \sqrt{\frac{B}{k}} \tan(\frac{c_2 -\sqrt{kB}t}{m}), & 9 \leq t \leq 26 \\
+    c_1 = -1250.0 \\
+    k = 103.\dot{5}\dot{3} \\
+    c_2 = 145677.3177225051 \\
+    B = 301257.94278185006 \\
+  \end{cases}
+\end{equation}
+
+$$ x = \int_0^26 v dt = \int_0^9 v dt + \int_9^26 v dt $$
+$$ \int \frac{m}{kt - c_1} dt = \frac{m}{k} \int \frac{k}{kt - c_1} dt = \frac{m}{k}\ln(kt - c_1) + \mbox{constant} $$
+$$ \int \sqrt{\frac{B}{k}}\tan(\frac{c_2 -\sqrt{kB}t}{m}) dt = \sqrt{\frac{B}{k}} \times \frac{-m}{\sqrt{kB}} \int \tan(\frac{c_2 - \sqrt{kB}t}{m})\times\frac{-\sqrt{kB}}{m} dt =$$
+$$ = \frac{m}{k} \int \frac{-\sin(u)}{\cos{u}} du = \frac{m}{k} \ln(\cos(\frac{c_2 - \sqrt{kB}t}{m})) + \mbox{constant} $$
+$$ \Rightarrow x = \left[\frac{m}{k}\ln(kt - c_1)\right]_0^9 + \left[\frac{m}{k} \ln(\cos(\frac{c_2 - \sqrt{kB}t}{m}))\right]_9^{26} = \frac{m}{k}\left(\ln(\frac{c_1 - 9k}{c_1}) + \ln(\frac{\cos(\frac{c_2 - 26\sqrt{kB}}{m})}{\cos(\frac{c_2 - 9\sqrt{kB}}{m})})\right) $$
+$$ \Rightarrow x = \frac{m}{k}\ln\left(\frac{(c_1 - 9k)\cos(\frac{c_2 - 26\sqrt{kB}}{m})}{c_1\cos(\frac{c_2 - 9\sqrt{kB}}{m})}\right) $$
+
+[[./img/first_model_integral.png]]
+
+$$ \Rightarrow x \approx 1058.650842313513 \approx 1060 $$
+
+The aeroplane fully stops in approximately $1060$ meters after touchdown, hence the runway has to be at least $1060$ meters long. However, I would advise length of $2000$ to be safe even if conditions change, for example in case touchdown occurs further, there is wind, friction between the wheels and the runway is lower.
+
+* Model 2
 ** General solution
 *** 0 \leq t < 9
 
@@ -213,7 +307,7 @@ $$ \Rightarrow v = \frac{\sqrt{4kW - \lambda^2}\tan(\frac{\sqrt{4kW-\lambda^2}}{
 
 $$ v = \begin{cases}\frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{\frac{\lambda}{m} t} - ke^{\frac{\lambda}{m}c_3}}, & t \in [0, 9] \\ \frac{\sqrt{4kW - \lambda^2}\tan(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t)) - \lambda}{2k}, & t \in [9, 26] \end{cases} $$
 $$ \Rightarrow \begin{cases}\frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{9\frac{\lambda}{m}} - ke^{\frac{\lambda}{m}c_3}} = 55 \\ \frac{\sqrt{4kW - \lambda^2}\tan(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - 9)) - \lambda}{2k} = 55 \end{cases} $$
-$$ \mbox{Let } (t_1, v_1), (t_2, v_2) \in S; t_1, t_2 \in [0, 9]; t_1 \neq t_2 $$
+$$ \mbox{Let } (t_1, v_1), (t_2, v_2) \in S; t_1, t_2 \in [0, 9]; t_1 > t_2 $$
 $$ \frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{t_1\frac{\lambda}{m}} - ke^{\frac{\lambda}{m}c_3}} = v_1 $$
 $$ \Rightarrow v_1ke^{\frac{\lambda}{m}c_3} = v_1e^{t_1\frac{\lambda}{m}} - \lambda e^{\frac{\lambda}{m} c_3} $$
 $$ \Rightarrow k = \frac{v_1e^{t_1\frac{\lambda}{m}} - \lambda e^{\frac{\lambda}{m} c_3}}{v_1e^{\frac{\lambda}{m}c_3}} $$
@@ -228,32 +322,47 @@ $$ \Rightarrow v_2 e^{\frac{\lambda}{m}(t_1 - t_2)} - (v_2\frac{\lambda}{v_1} - 
 $$ \Rightarrow e^{\frac{\lambda}{m}(c_3 - t_2)} = \frac{v_1v_2}{\lambda(v_2 - v_1)} (e^{\frac{\lambda}{m}(t_1 - t_2)} - 1) $$
 $$ \Rightarrow e^{\frac{\lambda}{m}c_3} = \frac{v_1v_2}{\lambda(v_2 - v_1)} (e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2}) $$
 $$ \Rightarrow c_3 = \frac{m}{\lambda}\ln(\frac{v_1v_2(e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2})}{\lambda(v_2 - v_1)}) $$
+$$ \mbox{Let } C = \{((t_1, v_1), (t_2, v_2)) \in S^2 | t_2 < t_1 \} $$
+$$ \Rightarrow \sum_{((t_1, v_1), (t_2, v_2)) \in C} c_3 = \sum_{((t_1, v_1), (t_2, v_2)) \in C}\frac{m}{\lambda}\ln(\frac{v_1v_2(e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2})}{\lambda(v_2 - v_1)}) $$
+$$ \Rightarrow |C| c_3 = \frac{m}{\lambda}\ln(\prod_{((t_1, v_1), (t_2, v_2)) \in C}\frac{v_1v_2(e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2})}{\lambda(v_2 - v_1)}) $$
+$$ \Rightarrow c_3 = \frac{m}{\lambda |C|}\ln(\prod_{((t_1, v_1), (t_2, v_2)) \in C}\frac{v_1v_2(e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2})}{\lambda(v_2 - v_1)}) $$
 $$ \frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{9\frac{\lambda}{m}} - ke^{\frac{\lambda}{m}c_3}} = 55 $$
 $$ \Rightarrow 55ke^{\frac{\lambda}{m}c_3} = 55e^{9\frac{\lambda}{m}} - \lambda e^{\frac{\lambda}{m} c_3} $$
 $$ \Rightarrow k = \frac{55e^{9\frac{\lambda}{m}} - \lambda e^{\frac{\lambda}{m} c_3}}{55e^{\frac{\lambda}{m}c_3}} $$
 $$ \Rightarrow k = e^{\frac{\lambda}{m}(9 - c_3)} - \frac{\lambda}{55} $$
-$$ v = \frac{\lambda e^{\frac{\lambda}{m} c}}{e^{\frac{\lambda}{m} t} - ke^{\frac{\lambda}{m}c}} $$
-$$ \Rightarrow v\frac{e^{\frac{\lambda}{m} t} - ke^{\frac{\lambda}{m}c}}{e^{\frac{\lambda}{m} c}} = \lambda $$
-$$ \Rightarrow v\frac{e^{\frac{\lambda}{m} t} - ke^{\frac{\lambda}{m}c}}{e^{\frac{\lambda}{m} c}} - \lambda = 0 $$
-$$ \mbox{Let } \zeta(\lambda) = v_3\frac{e^{\frac{\lambda}{m} t_3} - ke^{\frac{\lambda}{m}c_3}}{e^{\frac{\lambda}{m} c_3}} - \lambda $$
-$$ \lambda_{n+1} = \lambda_n - \frac{\zeta(\lambda_n)}{\zeta'(\lambda_n)} \mbox{ (Newton-Raphson method)} $$
+$$ \hat{v} = \frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{\frac{\lambda}{m} t} - ke^{\frac{\lambda}{m}c_3}} $$
+$$ J = \sum_{(t,v) \in S, t \leq 9} (\hat{v} - v)^2 $$
+
+$J$ is a sum of squares of all errors for $t \leq 9$. We want to minimize this error, so I will set it partial derivative to zero to find the value of $\lambda$ that minimizes $J$.
+
+$$ \mbox{Let } \zeta(\lambda) = \frac{\partial J}{\partial \lambda} = 0 $$
+# $$ \mbox{Let } \zeta(\lambda) = v_3\frac{e^{\frac{\lambda}{m} t_3} - ke^{\frac{\lambda}{m}c_3}}{e^{\frac{\lambda}{m} c_3}} - \lambda $$
+$$ \Rightarrow \zeta(\lambda) = \partial_{\lambda}\sum_{(t,v) \in S, t \leq 9} (\hat{v} - v)^2 $$
+$$ \lambda_{n+1} = \lambda_n - \frac{\zeta(\lambda)}{\zeta'(\lambda)} \mbox{ (Newton-Raphson method)} $$
 $$ \frac{\sqrt{4kW - \lambda^2}\tan(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - 9)) - \lambda}{2k} = 55 $$
 $$ \Rightarrow \sqrt{4kW - \lambda^2}\tan(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - 9)) = 2k55 + \lambda $$
 $$ \Rightarrow \frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - 9) = \arctan(\frac{2k55 + \lambda}{\sqrt{4kW - \lambda^2}}) $$
 $$ \Rightarrow c_4 = 9 + \frac{2m\arctan(\frac{2k55 + \lambda}{\sqrt{4kW - \lambda^2}})}{\sqrt{4kW-\lambda^2}} $$
-$$ \mbox{Let } (t_4, v_4) \in S; t_4 \in [9, 26] $$
-$$ \frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t_4) = \arctan(\frac{2kv_4 + \lambda}{\sqrt{4kW - \lambda^2}}) $$
-$$ \Rightarrow \frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t_4) - \arctan(\frac{2kv_4 + \lambda}{\sqrt{4kW - \lambda^2}}) = 0 $$
-$$ \mbox{Let } \phi(W) = \frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t_4) - \arctan(\frac{2kv_4 + \lambda}{\sqrt{4kW - \lambda^2}}) $$
+# $$ \mbox{Let } (t_4, v_4) \in S; t_4 \in [10, 26] $$
+$$ \frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t) = \arctan(\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}}) $$
+$$ \Rightarrow \frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t) - \arctan(\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}}) = 0 $$
+$$ I = \sum_{(t,v) \in S, t \geq 9} \left(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t) - \arctan(\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}})\right)^2 $$
+
+We want to find minimum of $I$.
+
+# $$ \mbox{Let } \phi(W) = \frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t_4) - \arctan(\frac{2kv_4 + \lambda}{\sqrt{4kW - \lambda^2}}) $$
+$$ \mbox{Let } \phi(W) = \frac{\partial I}{\partial W} = 0 $$
+$$ \Rightarrow \phi(W) = \partial_W \sum_{(t,v) \in S, t \geq 9} \left(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t) - \arctan(\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}})\right)^2 $$
 $$ \Rightarrow W_{n+1} = W_n - \frac{\phi(W)}{\phi'(W)} $$
 \begin{equation}
   \begin{cases}
-    c_3 = \frac{m}{\lambda}\ln(\frac{v_1v_2(e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2})}{\lambda(v_2 - v_1)}) \\
+    C = \{((t_1, v_1), (t_2, v_2)) \in S^2 | t_2 < t_1 \} \\
+    c_3 = \frac{m}{\lambda |C|}\ln(\prod_{((t_1, v_1), (t_2, v_2)) \in C}\frac{v_1v_2(e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2})}{\lambda(v_2 - v_1)}) \\
     k = e^{\frac{\lambda}{m}(9 - c_3)} - \frac{\lambda}{55} \\
-    \zeta(\lambda) = v_3\frac{e^{\frac{\lambda}{m} t_3} - ke^{\frac{\lambda}{m}c_3}}{e^{\frac{\lambda}{m} c_3}} - \lambda \\
+    \zeta(\lambda) = \partial_{\lambda}\sum_{(t,v) \in S, t \leq 9} (\frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{\frac{\lambda}{m} t} - ke^{\frac{\lambda}{m}c_3}} - v)^2 \\
     \lambda_{n+1} = \lambda_n - \frac{\zeta(\lambda_n)}{\zeta'(\lambda_n)} \\
     c_4 = 9 + \frac{2m\arctan(\frac{110k + \lambda}{\sqrt{4kW - \lambda^2}})}{\sqrt{4kW-\lambda^2}} \\
-    \phi(W) = \frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t_4) - \arctan(\frac{2kv_4 + \lambda}{\sqrt{4kW - \lambda^2}}) \\
+    \phi(W) = \partial_W \sum_{(t,v) \in S, t \geq 9} \left(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t) - \arctan(\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}})\right)^2 \\
     W_{n+1} = W_n - \frac{\phi(W)}{\phi'(W)}
   \end{cases}
 \end{equation}

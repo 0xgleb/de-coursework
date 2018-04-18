@@ -28,8 +28,8 @@ source-repository head
 library
   hs-source-dirs:
       src
-  build-depends:
-      base >=4.7 && <5
+  build-depends: base >=4.7 && <5
+               , sized-types
   exposed-modules: AutoDiff
                  , GivenData
                  , FirstModel
