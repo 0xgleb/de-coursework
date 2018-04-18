@@ -1,6 +1,5 @@
 flags: {}
 packages:
 - .
-extra-deps:
-- sized-types-0.3.5.2
+extra-deps: []
 resolver: lts-11.5

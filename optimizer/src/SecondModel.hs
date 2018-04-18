@@ -3,19 +3,32 @@
 module SecondModel where
 
 import           AutoDiff
+import           Data.Vector (Vector, (!))
+import qualified Data.Vector as V
 import           GivenData
 
 data Parameters a =
-    Parameters { lambda :: a
-               , c3     :: a
-               , k      :: a
-               , w      :: a
-               , c4     :: a
-               -- , p1     :: Point a
-               -- , p2     :: Point a
-               -- , p3     :: Point a
-               -- , p4     :: Point a
-               } deriving Show
+    Parameters { pLambda :: a
+               , pC3     :: a
+               , pK      :: a
+               , pW      :: a
+               , pC4     :: a
+               } deriving (Show, Eq)
+
+paramToVector :: Parameters a -> Vector a
+paramToVector Parameters{..} = V.singleton pLambda `V.snoc` pC3 `V.snoc` pK `V.snoc` pW `V.snoc` pC4
+
+vectorToParam :: Vector a -> Parameters a
+vectorToParam vector =
+  Parameters { pLambda = vector ! 0
+             , pC3     = vector ! 1
+             , pK      = vector ! 2
+             , pW      = vector ! 3
+             , pC4     = vector ! 4
+             }
+
+residuals :: (Floating a, Enum a, Ord a) => Vector a -> Vector a
+residuals b = (\(Point t v) -> predict (vectorToParam b) t - v) <$>  vectorPoints
 
 c3F :: (Floating a, Enum a, Ord a) => a -> a
 c3F lambda = (\l -> m * log (product l) / (lambda * fromIntegral (length l))) $ uncurry c3F'
@@ -82,23 +95,23 @@ findParams :: (Floating a, Ord a, Enum a) => () -> Parameters a
 findParams () = parameters
   where initLambda = 542.177309345586
         parameters = Parameters
-          { lambda = newton zeta (Left 1000) initLambda
-          , c3 = c3F (lambda parameters)
-          , k = kF (c3 parameters) (lambda parameters)
-          , w = newton ( phi (constDual $ c3 parameters)
-                             (constDual $ k parameters)
-                             (constDual $ lambda parameters) )
-                       (Left 1000)
-                       -- ((<= 10**(-13)) . abs . phi (k parameters) (lambda parameters))
-                       312337.00320604927
-          , c4 = c4F (c3 parameters) (k parameters) (lambda parameters) (w parameters)
+          { pLambda = newton zeta (Left 1000) initLambda
+          , pC3 = c3F (pLambda parameters)
+          , pK = kF (pC3 parameters) (pLambda parameters)
+          , pW = newton ( phi (constDual $ pC3 parameters)
+                              (constDual $ pK parameters)
+                              (constDual $ pLambda parameters) )
+                        (Left 1000)
+                        -- ((<= 10**(-13)) . abs . phi (k parameters) (lambda parameters))
+                        312337.00320604927
+          , pC4 = c4F (pC3 parameters) (pK parameters) (pLambda parameters) (pW parameters)
           }
 
 
 predict :: (Ord a, Floating a) => Parameters a -> a -> a
 predict Parameters{..} t
-  | 0 <= t && t <= 9  = let h = lambda / m in lambda * exp (h*c3) / (exp (h*t) - k * exp (h*c3))
-  | 9 <  t && t <= 26 = let r = sqrt $ 4*k*w - lambda^2 in (r * tan (r * (c4 - t) / (2 * m)) - lambda) / (2 * k)
+  | 0 <= t && t <= 9  = let h = pLambda / m in pLambda * exp (h*pC3) / (exp (h*t) - pK * exp (h*pC3))
+  | 9 <  t && t <= 26 = let r = sqrt $ 4*pK*pW - pLambda^2 in (r * tan (r * (pC4 - t) / (2 * m)) - pLambda) / (2 * pK)
   | otherwise = error "Invalid time!"
 
 

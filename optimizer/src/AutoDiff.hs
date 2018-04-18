@@ -1,9 +1,8 @@
-{-# LANGUAGE DataKinds            #-}
-{-# LANGUAGE TypeSynonymInstances #-}
-
 module AutoDiff where
 
-import           Data.Sized.Matrix
+import Data.Matrix
+import Data.Vector (Vector)
+import qualified Data.Vector as V
 
 data Dual a =
     Dual { val  :: a
@@ -72,22 +71,18 @@ newton f stop y = newtonHelper stop y y
           where nextX = x - toNormalF f x / d f x
                 minCheck = abs (toNormalF f x) < abs (toNormalF f minX)
 
+jacobian :: Num a => (Vector (Dual a) -> Vector (Dual a)) -> Vector a -> Matrix a
+jacobian f xs = fmap diff $ flatten $ rowVector
+              $ V.imap (\i _ -> colVector $ f $ V.imap (\j z -> Dual z $ if i == j then 1 else 0) xs) xs
 
-jacobian :: (Size m, Size n, Num a) =>
-            (Matrix n (Dual a) -> Matrix m (Dual a)) -> Matrix n a -> Matrix (m, n) a
-jacobian f xs = fmap diff $ joinColumns $ forEach xs
-              $ \i _ -> f $ forEach xs (\j z -> Dual z $ if i == j then 1 else 0)
+toNormalFF :: (Num a, Num b, Functor f) => (f (Dual a) -> f (Dual b)) -> f a -> f b
+toNormalFF f = fmap val . f . fmap constDual
 
-
-class Size n => Invertable n where
-    inverse :: Fractional a => Matrix (n, n) a -> Matrix (n, n) a
-
-instance Invertable X1 where
-    inverse = id
-
--- gaussNewton :: (Size m, Size n, Num a) =>
---                (Matrix n (Dual a) -> Matrix m (Dual a)) -> Integer -> Matrix n a -> Matrix n a
--- gaussNewton r n b
---   | n > 0 = zipWith (-) b $ (transpose j `mm` j)
---   | otherwise = b
---   where j = jacobian r b
+gaussNewton :: (Fractional a, Eq a) => (Vector (Dual a) -> Vector (Dual a)) -> Integer -> Vector a -> Vector a
+gaussNewton r n b
+  | n > 0 = V.zipWith (-) b $ getMatrixAsVector $ (unsafeFromRight (inverse $ jT * j) * jT) * colVector (toNormalFF r b)
+  | otherwise = b
+  where j  = jacobian r b
+        jT = transpose j
+        unsafeFromRight (Right x) = x
+        unsafeFromRight (Left  _) = error "Called unsafeFromRight on (Left _)"
