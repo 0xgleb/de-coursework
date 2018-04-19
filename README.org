@@ -21,7 +21,7 @@
 
 \newpage
 
-# \tableofcontents
+\tableofcontents
 
 \newpage
 
@@ -302,10 +302,10 @@ $$ \Rightarrow m\int \frac{1}{kv^2 + \lambda v + W} dv = m\int \frac{1}{(W - \fr
 $$ \Rightarrow \frac{2m}{\sqrt{4kW-\lambda^2}}\arctan(\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}}) = -t + c_4 $$
 $$ \Rightarrow \frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}} = \tan(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t)) $$
 $$ \Rightarrow v = \frac{\sqrt{4kW - \lambda^2}\tan(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t)) - \lambda}{2k}  $$
+$$ \Rightarrow v = \begin{cases}\frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{\frac{\lambda}{m} t} - ke^{\frac{\lambda}{m}c_3}}, & t \in [0, 9] \\ \frac{\sqrt{4kW - \lambda^2}\tan(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t)) - \lambda}{2k}, & t \in [9, 26] \end{cases} $$
 
 ** Particular solution
 
-$$ v = \begin{cases}\frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{\frac{\lambda}{m} t} - ke^{\frac{\lambda}{m}c_3}}, & t \in [0, 9] \\ \frac{\sqrt{4kW - \lambda^2}\tan(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t)) - \lambda}{2k}, & t \in [9, 26] \end{cases} $$
 $$ \Rightarrow \begin{cases}\frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{9\frac{\lambda}{m}} - ke^{\frac{\lambda}{m}c_3}} = 55 \\ \frac{\sqrt{4kW - \lambda^2}\tan(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - 9)) - \lambda}{2k} = 55 \end{cases} $$
 $$ \mbox{Let } (t_1, v_1), (t_2, v_2) \in S; t_1, t_2 \in [0, 9]; t_1 > t_2 $$
 $$ \frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{t_1\frac{\lambda}{m}} - ke^{\frac{\lambda}{m}c_3}} = v_1 $$
@@ -366,5 +366,15 @@ $$ \Rightarrow W_{n+1} = W_n - \frac{\phi(W)}{\phi'(W)} $$
     W_{n+1} = W_n - \frac{\phi(W)}{\phi'(W)}
   \end{cases}
 \end{equation}
+
+I wrote another module for the second model:
+
+#+INCLUDE: "./optimizer/src/SecondModel.hs" src haskell
+
+And I changed the main module because now I get only one set of parameters from the code.
+
+#+INCLUDE: "./optimizer/app/Main.hs" src haskell
+
+[[./img/second_model_code_result.png]]
 
 * Assessment of the improvement obtained
