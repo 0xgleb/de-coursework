@@ -15,20 +15,17 @@ data Parameters a =
                , pC4     :: a
                } deriving (Show, Eq)
 
-paramToVector :: Parameters a -> Vector a
-paramToVector Parameters{..} = V.singleton pLambda `V.snoc` pC3 `V.snoc` pK `V.snoc` pW `V.snoc` pC4
-
-vectorToParam :: Vector a -> Parameters a
+vectorToParam :: Floating a => Vector a -> Parameters a
 vectorToParam vector =
   Parameters { pLambda = vector ! 0
              , pC3     = vector ! 1
-             , pK      = vector ! 2
+             , pK      = kF (vector ! 1) (vector ! 0)
              , pW      = vector ! 3
              , pC4     = vector ! 4
              }
 
 residuals :: (Floating a, Enum a, Ord a) => Vector a -> Vector a
-residuals b = (\(Point t v) -> predict (vectorToParam b) t - v) <$>  vectorPoints
+residuals b = (\(Point t v) -> predict (vectorToParam b) t - v) <$> V.take 10 vectorPoints
 
 c3F :: (Floating a, Enum a, Ord a) => a -> a
 c3F lambda = (\l -> m * log (product l) / (lambda * fromIntegral (length l))) $ uncurry c3F'
@@ -41,11 +38,13 @@ c3F lambda = (\l -> m * log (product l) / (lambda * fromIntegral (length l))) $ 
 -- c3F (Point t1 v1) (Point t2 v2) lambda =
 --   m / lambda * log ((v1 * v2 * (exp (lambda / m * t1) - exp (lambda / m * t2))) / (lambda * (v2 - v1)))
 
-kF :: (Floating a, Eq a, Enum a) => a -> a -> a
-kF c3 lambda = (/10) $ sum $ (\Point{..} -> exp (lambda / m * (pTime - c3)) - lambda / pSpeed)
-            <$> take 10 points
+kF :: Floating a => a -> a -> a
+kF c3 lambda = exp (lambda / m * (9 - c3)) - lambda / 55
+-- kF :: (Floating a, Eq a, Enum a) => a -> a -> a
+-- kF c3 lambda = (/10) $ sum $ (\Point{..} -> exp (lambda / m * (pTime - c3)) - lambda / pSpeed)
+--             <$> take 10 points
 
-quadraticError :: (Num a, Enum a) => [Point a] -> (Point a -> a -> a) -> a -> a
+quadraticError :: (Num a, Foldable t, Functor t) => t b -> (b -> c -> a) -> c -> a
 quadraticError ps f u = sum $ (^2) . flip f u <$> ps
 
 zeta :: (Floating a, Ord a, Enum a) => a -> a
@@ -107,14 +106,8 @@ findParams () = parameters
           , pC4 = c4F (pC3 parameters) (pK parameters) (pLambda parameters) (pW parameters)
           }
 
-initParams :: Num a => Parameters a
-initParams =
-  Parameters { pLambda = 700
-             , pC3 = -21030
-             , pK = 103
-             , pW = 300000
-             , pC4 = 25
-             }
+initParams :: Fractional a => Vector a
+initParams = (/120000) <$> V.fromList [957, -577]
 
 predict :: (Ord a, Floating a) => Parameters a -> a -> a
 predict Parameters{..} t
