@@ -257,7 +257,7 @@ As you can see in [[first_model_code_result]] rounded predictions of the best co
   \end{cases}
 \end{equation}
 
-$$ x = \int_0^26 v dt = \int_0^9 v dt + \int_9^26 v dt $$
+$$ x = \int_0^{26} v dt = \int_0^9 v dt + \int_9^{26} v dt $$
 $$ \int \frac{m}{kt - c_1} dt = \frac{m}{k} \int \frac{k}{kt - c_1} dt = \frac{m}{k}\ln(kt - c_1) + \mbox{constant} $$
 $$ \int \sqrt{\frac{B}{k}}\tan(\frac{c_2 -\sqrt{kB}t}{m}) dt = \sqrt{\frac{B}{k}} \times \frac{-m}{\sqrt{kB}} \int \tan(\frac{c_2 - \sqrt{kB}t}{m})\times\frac{-\sqrt{kB}}{m} dt =$$
 $$ = \frac{m}{k} \int \frac{-\sin(u)}{\cos{u}} du = \frac{m}{k} \ln(\cos(\frac{c_2 - \sqrt{kB}t}{m})) + \mbox{constant} $$
