@@ -70,19 +70,3 @@ newton f stop y = newtonHelper stop y y
                                      nextX
           where nextX = x - toNormalF f x / d f x
                 minCheck = abs (toNormalF f x) < abs (toNormalF f minX)
-
-jacobian :: Num a => (Vector (Dual a) -> Vector (Dual a)) -> Vector a -> Matrix a
-jacobian f xs = fmap diff $ flatten $ rowVector
-              $ V.imap (\i _ -> colVector $ f $ V.imap (\j z -> Dual z $ if i == j then 1 else 0) xs) xs
-
-toNormalFF :: (Num a, Num b, Functor f) => (f (Dual a) -> f (Dual b)) -> f a -> f b
-toNormalFF f = fmap val . f . fmap constDual
-
-gaussNewton :: (Fractional a, Eq a) => (Vector (Dual a) -> Vector (Dual a)) -> Integer -> Vector a -> Vector a
-gaussNewton r n b
-  | n > 0 = gaussNewton r (n-1) $ V.zipWith (-) b $ getMatrixAsVector $ (unsafeFromRight (inverse $ jT * j) * jT) * colVector (toNormalFF r b)
-  | otherwise = b
-  where j  = jacobian r b
-        jT = transpose j
-        unsafeFromRight (Right x) = x
-        unsafeFromRight (Left  s) = error $ "Called unsafeFromRight on (Left " ++ s ++ ")"

@@ -33,8 +33,9 @@ library
                , matrix
   exposed-modules: AutoDiff
                  , GivenData
-                 , FirstModel
-                 , SecondModel
+                 , Solution.Model
+                 , Solution.First
+                 , Solution.Second
   other-modules:
       Paths_optimizer
   default-language: Haskell2010
