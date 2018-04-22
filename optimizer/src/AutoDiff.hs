@@ -80,7 +80,7 @@ toNormalFF f = fmap val . f . fmap constDual
 
 gaussNewton :: (Fractional a, Eq a) => (Vector (Dual a) -> Vector (Dual a)) -> Integer -> Vector a -> Vector a
 gaussNewton r n b
-  | n > 0 = gaussNewton r (n-1) $ V.zipWith (-) b $ getMatrixAsVector $ (unsafeFromRight (inverse $ jT * j) * jT) * colVector (toNormalFF r b)
+  | n > 0 = V.zipWith (-) b $ getMatrixAsVector $ (unsafeFromRight (inverse $ jT * j) * jT) * colVector (toNormalFF r b)
   | otherwise = b
   where j  = jacobian r b
         jT = transpose j

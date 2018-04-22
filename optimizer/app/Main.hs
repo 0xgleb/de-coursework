@@ -1,5 +1,3 @@
-module Main where
-
 import           Data.List  (sortOn)
 import qualified SecondModel as Model
 import           GivenData

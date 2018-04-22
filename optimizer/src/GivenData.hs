@@ -21,7 +21,7 @@ vectorPoints :: (Num a, Enum a) => Vector (Point a)
 vectorPoints = V.fromList points
 
 m :: Num a => a
-m = 1
+m = 120000
 
 toDualPoint :: Num a => Point a -> Point (Dual a)
 toDualPoint Point{..} = Point (constDual pTime) (constDual pSpeed)

@@ -1,6 +1,5 @@
 flags: {}
 packages:
 - .
-extra-deps:
-- HaskellLM-0.1.2
+extra-deps: []
 resolver: lts-11.5
