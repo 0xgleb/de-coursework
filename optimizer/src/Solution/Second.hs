@@ -30,13 +30,13 @@ instance Show a => Show (SolutionGen a) where
 
 
 instance Show a => Show (Parameters a) where
-    show Parameters{..} =    "λ = " ++ show pLambda
-                       ++ ", c3 = " ++ show pC3
-                       ++  ", K = " ++ show pK
-                       ++  ", W = " ++ show pW
-                       ++ ", c4 = " ++ show pC4
-                       ++ show pGen
-                       ++ "\n"
+    show Parameters{..} = "lambda = " ++ show pLambda
+                         ++ ", c3 = " ++ show pC3
+                         ++  ", K = " ++ show pK
+                         ++  ", W = " ++ show pW
+                         ++ ", c4 = " ++ show pC4
+                         ++ show pGen
+                         ++ "\n"
 
 c3F :: Floating a => Point a -> Point a -> a -> a
 c3F (Point t1 v1) (Point t2 v2) lambda =
@@ -45,11 +45,11 @@ c3F (Point t1 v1) (Point t2 v2) lambda =
 kF :: (Floating a, Ord a, Enum a) => a -> a -> a
 kF c3 lambda = exp (lambda / m * (9 - c3)) - lambda / 55
 
-quadraticError :: (Num a, Enum a) => [Point a] -> (Point a -> a -> a) -> a -> a
-quadraticError ps f u = sum $ (^2) . flip f u <$> ps
+sumOfSquares :: (Num a, Enum a) => [Point a] -> (Point a -> a -> a) -> a -> a
+sumOfSquares ps f u = sum $ (^2) . flip f u <$> ps
 
 zeta :: (Floating a, Ord a, Enum a) => Point a -> Point a -> a -> a
-zeta p1 p2 = d $ quadraticError (take 10 points) j
+zeta p1 p2 = d $ sumOfSquares (take 10 points) j
   where j (Point t v) lambda = lambda * exp (h*c3) / (exp (h*t) - k * exp (h*c3)) - v
           where c3 = c3F (toDualPoint p1) (toDualPoint p2) lambda
                 k = kF c3 lambda
@@ -64,7 +64,7 @@ c4F c3 k lambda w =
 
 
 phi :: (Floating a, Enum a, Eq a) => a -> a -> a -> a -> a
-phi c3 k lambda = d $ quadraticError (drop 9 points) j
+phi c3 k lambda = d $ sumOfSquares (drop 9 points) j
   where j (Point t v) w =
           root * (c4 - t) / (2*m) - atan ((2 * constDual k * v + constDual lambda) / root)
           where c4 = c4F (constDual c3) (constDual k) (constDual lambda) w

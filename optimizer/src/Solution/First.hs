@@ -57,9 +57,9 @@ findParams gen@SolutionGen{..} = parameters
           Parameters { pC1 = c1F sgPoint1 sgPoint2
                      , pK  = kF $ pC1 parameters
                      , pC2 = c2F (pK parameters) (pB parameters)
-                     , pB = newton (lambda (toDualPoint sgPoint3) (constDual $ pK parameters))
-                                   (Right $ (<= 0.0001) . abs . lambda sgPoint3 (pK parameters))
-                                   300000
+                     , pB  = newton (lambda (toDualPoint sgPoint3) (constDual $ pK parameters))
+                                    (Right $ (<= 0.0001) . abs . lambda sgPoint3 (pK parameters))
+                                    300000
                      , pGen = gen
                      }
 

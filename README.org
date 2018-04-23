@@ -68,7 +68,6 @@ The image below shows a chart of the original data.
 - *There is no wind*. This allows us to assume that if the plane is not moving then there is no air resistance.
 
 #+ATTR_LATEX: :mode math :environment bmatrix
-#+NAME: table_of_differences
 |----+----+----------+-------------------|
 |  t |  v | \Delta v | \Delta (\Delta v) |
 |----+----+----------+-------------------|
@@ -117,7 +116,7 @@ $$ \mbox{where } m = 120 000 $$
 * Model 1
 ** Defining f(v)
 
-As you can see in [[table_of_differences]] speed for $t \in (0, 9)$ clearly isn't decreasing linearly. And you can see that, as speed decreases (in that interval), the rate at which it decreases also decreases. So it's reasonable to suggest that
+As you can see in the table with the differences, speed for $t \in (0, 9)$ clearly isn't decreasing linearly. And you can see that, as speed decreases (in that interval), the rate at which it decreases also decreases. So it's reasonable to suggest that
 
 $$ f(v) \propto v^2 $$
 $$ \Rightarrow f(v) = kv^2 $$
@@ -209,12 +208,12 @@ The fourth module is for the first model and finding parameters.
 And finally the main module, which runs this code to find the parameters.
 
 #+BEGIN_SRC haskell
-import           Data.List       (sort, sortOn)
+import           Data.List      (sort, sortOn)
 import           Data.Proxy
 
 import           GivenData
-import           Solution.Model  as Model
 import qualified Solution.First as Sol
+import           Solution.Model as Model
 
 adjustLength :: (a -> String) -> (a -> String -> b) -> [a] -> [b]
 adjustLength g s l =
@@ -268,7 +267,10 @@ results =  sortOn (rms predict) $ findParams
       <$> combinations (Proxy :: Proxy Sol.Parameters)
 
 main :: IO ()
-main = putStr $ showResults $ head results
+main = do putStrLn "The best result:"
+          putStrLn $ showResults $ head results
+          putStrLn "The worst result:"
+          putStr   $ showResults $ last results
 #+END_SRC
 
 Here is the result. It shows the best and the worst parameters found using the derived formulas and for both of the configurations it shows sums of squares of errors, and predictions for each of the given point with rounded versions.
@@ -375,6 +377,7 @@ $$ \Rightarrow x \approx 1058.650842313513 \approx 1060 $$
 The aeroplane fully stops in approximately $1060$ meters after touchdown, hence the runway has to be at least $1060$ meters long. However, I would advise length of $2000$ to be safe even if conditions change, for example in case touchdown occurs further, there is wind, friction between the wheels and the runway is lower.
 
 * Model 2
+** Redefining f(v)
 ** General solution
 *** 0 \leq t < 9
 
@@ -426,10 +429,6 @@ $$ \Rightarrow v_2 e^{\frac{\lambda}{m}(t_1 - t_2)} - (v_2\frac{\lambda}{v_1} - 
 $$ \Rightarrow e^{\frac{\lambda}{m}(c_3 - t_2)} = \frac{v_1v_2}{\lambda(v_2 - v_1)} (e^{\frac{\lambda}{m}(t_1 - t_2)} - 1) $$
 $$ \Rightarrow e^{\frac{\lambda}{m}c_3} = \frac{v_1v_2}{\lambda(v_2 - v_1)} (e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2}) $$
 $$ \Rightarrow c_3 = \frac{m}{\lambda}\ln(\frac{v_1v_2(e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2})}{\lambda(v_2 - v_1)}) $$
-$$ \mbox{Let } C = \{((t_1, v_1), (t_2, v_2)) \in S^2 | t_2 < t_1 \} $$
-$$ \Rightarrow \sum_{((t_1, v_1), (t_2, v_2)) \in C} c_3 = \sum_{((t_1, v_1), (t_2, v_2)) \in C}\frac{m}{\lambda}\ln(\frac{v_1v_2(e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2})}{\lambda(v_2 - v_1)}) $$
-$$ \Rightarrow |C| c_3 = \frac{m}{\lambda}\ln(\prod_{((t_1, v_1), (t_2, v_2)) \in C}\frac{v_1v_2(e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2})}{\lambda(v_2 - v_1)}) $$
-$$ \Rightarrow c_3 = \frac{m}{\lambda |C|}\ln(\prod_{((t_1, v_1), (t_2, v_2)) \in C}\frac{v_1v_2(e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2})}{\lambda(v_2 - v_1)}) $$
 $$ \frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{9\frac{\lambda}{m}} - ke^{\frac{\lambda}{m}c_3}} = 55 $$
 $$ \Rightarrow 55ke^{\frac{\lambda}{m}c_3} = 55e^{9\frac{\lambda}{m}} - \lambda e^{\frac{\lambda}{m} c_3} $$
 $$ \Rightarrow k = \frac{55e^{9\frac{\lambda}{m}} - \lambda e^{\frac{\lambda}{m} c_3}}{55e^{\frac{\lambda}{m}c_3}} $$
@@ -440,28 +439,24 @@ $$ J = \sum_{(t,v) \in S, t \leq 9} (\hat{v} - v)^2 $$
 $J$ is a sum of squares of all errors for $t \leq 9$. We want to minimize this error, so I will set it partial derivative to zero to find the value of $\lambda$ that minimizes $J$.
 
 $$ \mbox{Let } \zeta(\lambda) = \frac{\partial J}{\partial \lambda} = 0 $$
-# $$ \mbox{Let } \zeta(\lambda) = v_3\frac{e^{\frac{\lambda}{m} t_3} - ke^{\frac{\lambda}{m}c_3}}{e^{\frac{\lambda}{m} c_3}} - \lambda $$
 $$ \Rightarrow \zeta(\lambda) = \partial_{\lambda}\sum_{(t,v) \in S, t \leq 9} (\hat{v} - v)^2 $$
 $$ \lambda_{n+1} = \lambda_n - \frac{\zeta(\lambda)}{\zeta'(\lambda)} \mbox{ (Newton-Raphson method)} $$
 $$ \frac{\sqrt{4kW - \lambda^2}\tan(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - 9)) - \lambda}{2k} = 55 $$
 $$ \Rightarrow \sqrt{4kW - \lambda^2}\tan(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - 9)) = 2k55 + \lambda $$
 $$ \Rightarrow \frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - 9) = \arctan(\frac{2k55 + \lambda}{\sqrt{4kW - \lambda^2}}) $$
 $$ \Rightarrow c_4 = 9 + \frac{2m\arctan(\frac{2k55 + \lambda}{\sqrt{4kW - \lambda^2}})}{\sqrt{4kW-\lambda^2}} $$
-# $$ \mbox{Let } (t_4, v_4) \in S; t_4 \in [10, 26] $$
 $$ \frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t) = \arctan(\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}}) $$
 $$ \Rightarrow \frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t) - \arctan(\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}}) = 0 $$
 $$ I = \sum_{(t,v) \in S, t \geq 9} \left(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t) - \arctan(\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}})\right)^2 $$
 
 We want to find minimum of $I$.
 
-# $$ \mbox{Let } \phi(W) = \frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t_4) - \arctan(\frac{2kv_4 + \lambda}{\sqrt{4kW - \lambda^2}}) $$
 $$ \mbox{Let } \phi(W) = \frac{\partial I}{\partial W} = 0 $$
 $$ \Rightarrow \phi(W) = \partial_W \sum_{(t,v) \in S, t \geq 9} \left(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t) - \arctan(\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}})\right)^2 $$
 $$ \Rightarrow W_{n+1} = W_n - \frac{\phi(W)}{\phi'(W)} $$
 \begin{equation}
   \begin{cases}
-    C = \{((t_1, v_1), (t_2, v_2)) \in S^2 | t_2 < t_1 \} \\
-    c_3 = \frac{m}{\lambda |C|}\ln(\prod_{((t_1, v_1), (t_2, v_2)) \in C}\frac{v_1v_2(e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2})}{\lambda(v_2 - v_1)}) \\
+    c_3 = \frac{m}{\lambda}\ln(\frac{v_1v_2(e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2})}{\lambda(v_2 - v_1)}) \\
     k = e^{\frac{\lambda}{m}(9 - c_3)} - \frac{\lambda}{55} \\
     \zeta(\lambda) = \partial_{\lambda}\sum_{(t,v) \in S, t \leq 9} (\frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{\frac{\lambda}{m} t} - ke^{\frac{\lambda}{m}c_3}} - v)^2 \\
     \lambda_{n+1} = \lambda_n - \frac{\zeta(\lambda_n)}{\zeta'(\lambda_n)} \\
@@ -475,8 +470,12 @@ I wrote another module for the second model:
 
 #+INCLUDE: "./optimizer/src/Solution/Second.hs" src haskell
 
+I also changed ~import Solution.First as Sol~ to ~import Solution.Second as Sol~ in the main module. This code gives us the following result.
+
+#+NAME: second_model_code_result
 [[./img/second_model_code_result.png]]
 
+** Graphs and Analysis
 
 |------+---------------------+-------------------------+----------------|
 | Time |     Predicted Speed | Rounded predicted speed | Observed Speed |
@@ -542,4 +541,83 @@ I wrote another module for the second model:
 | 0.4558837377913889 | 0.23458170693637476 | 5.25613462052476e-2 |
 |--------------------+---------------------+---------------------|
 
+I'll now look at the two configurations that I obtained and plot them. The red line shows the worst configuration, and the green line shows the best configuration.
+
+[[./img/second_model_graph_result.png]]
+
+As you can see in [[second_model_code_result]] rounded predictions of the best configuration exactly match the given data.
+
+** Conclusion of Model 2
 * Assessment of the improvement obtained
+
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| Time | Predicted Speed (1st Model) | Predicted Speed (2nd Model) | Observed Speed | Better Model |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+|  0.0 |                        96.0 |            96.0000000000054 |             96 | 1st          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+|  1.0 |           88.65671641791045 |           88.66582512227822 |             89 | 2nd          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+|  2.0 |           82.35701906412478 |           82.37077686914407 |             82 | 1st          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+|  3.0 |           76.89320388349515 |           76.90862555559508 |             77 | 2nd          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+|  4.0 |            72.1092564491654 |           72.12432763292139 |             72 | 1st          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+|  5.0 |           67.88571428571429 |           67.89907302369585 |             68 | 2nd          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+|  6.0 |           64.12955465587045 |           64.14028474770049 |             64 | 1st          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+|  7.0 |          60.767263427109974 |           60.77475738769026 |             61 | 2nd          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+|  8.0 |          57.739975698663415 |          57.743842139329196 |             58 | 2nd          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+|  9.0 |           54.99999999999999 |           55.00000000000179 |             55 | 1st          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 10.0 |           50.10816658852111 |           50.10157524003789 |             50 | 2nd          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 11.0 |          45.622063036212374 |           45.60871998373162 |             46 | 2nd          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 12.0 |          41.475988862696376 |           41.45588373779139 |             41 | 2nd          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 13.0 |           37.61659930730753 |            37.5898231332195 |             38 | 1st          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 14.0 |           34.00002062308155 |           33.96673336319917 |             34 | 1st          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 15.0 |          30.589724513917773 |          30.550133354391157 |             31 | 1st          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 16.0 |           27.35493651754378 |          27.309281417030515 |             27 | 2nd          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 17.0 |          24.269426053394415 |          24.217970303658813 |             24 | 2nd          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 18.0 |            21.3105731783461 |          21.253597490201017 |             21 | 2nd          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 19.0 |           18.45863841578133 |          18.396437545757497 |             18 | 2nd          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 20.0 |          15.696183121094782 |          15.629064386691416 |             16 | 1st          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 21.0 |           13.00760227741885 |          12.935885534732083 |             13 | 1st          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 22.0 |          10.378741615250261 |           10.30276043083657 |             10 | 2nd          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 23.0 |           7.796577949697343 |           7.716681813438704 |              8 | 1st          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 24.0 |           5.248946558956161 |           5.165504072768728 |              5 | 2nd          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 25.0 |          2.7243028986249413 |          2.6377059483218517 |              3 | 1st          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+| 26.0 |          0.2115083630415522 |         0.12217734574065967 |              0 | 2nd          |
+|------+-----------------------------+-----------------------------+----------------+--------------|
+
+|-------+---------------------+---------------------+----------------------+----------------------------|
+| Model |       Maximum Error |       Average Error |     Root mean square | Num. of better predictions |
+|-------+---------------------+---------------------+----------------------+----------------------------|
+| 1st   |  0.4558837377913889 | 0.23458170693637476 |  5.25613462052476e-2 |                         12 |
+|-------+---------------------+---------------------+----------------------+----------------------------|
+| 2nd   | 0.47598886269637575 | 0.23822424753496707 | 5.344098631088544e-2 |                         15 |
+|-------+---------------------+---------------------+----------------------+----------------------------|
+
+Here is a graph of both of the models.
+
+[[./img/comparison_graph.png]]
+
+As you can see the second model gave more accurate predictions, but the increase in accuracy is very small.

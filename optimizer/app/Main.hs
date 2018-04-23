@@ -1,9 +1,9 @@
-import           Data.List       (sort, sortOn)
+import           Data.List      (sort, sortOn)
 import           Data.Proxy
 
 import           GivenData
-import           Solution.Model  as Model
 import qualified Solution.Second as Sol
+import           Solution.Model as Model
 
 adjustLength :: (a -> String) -> (a -> String -> b) -> [a] -> [b]
 adjustLength g s l =
@@ -34,7 +34,7 @@ avrErr predict params =
 
 rms :: (a -> Double -> Double) -> a -> Double
 rms predict params =
-  (/ n) $ sqrt $ sum $ (^2) . (\(Point t v) -> predict params t - v) <$> points
+  sqrt $ (/ n) $ sum $ (^2) . (\(Point t v) -> predict params t - v) <$> points
   where n = fromIntegral (length points)
 
 showErrors :: (ModelParams f, Show (f Double)) => f Double -> String
@@ -57,4 +57,7 @@ results =  sortOn (rms predict) $ findParams
       <$> combinations (Proxy :: Proxy Sol.Parameters)
 
 main :: IO ()
-main = putStr $ showResults $ head results
+main = do putStrLn "The best result:"
+          putStrLn $ showResults $ head results
+          putStrLn "The worst result:"
+          putStr   $ showResults $ last results
