@@ -61,6 +61,8 @@ d f x = diff . f $ Dual x 1
 toNormalF :: (Num a, Num b) => (Dual a -> Dual b) -> a -> b
 toNormalF f = val . f . constDual
 
+
+
 newton :: (Fractional a, Ord a) => (Dual a -> Dual a) -> Either Integer (a -> Bool) -> a -> a
 newton f stop y = newtonHelper stop y y
   where newtonHelper stopCond minX x

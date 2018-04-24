@@ -9,6 +9,7 @@ import           AutoDiff
 import           GivenData
 import qualified Solution.Model as M
 
+
 data Parameters a =
     Parameters { pC1  :: a
                , pK   :: a
@@ -17,11 +18,13 @@ data Parameters a =
                , pGen :: SolutionGen a
                }
 
+
 data SolutionGen a =
     SolutionGen { sgPoint1 :: Point a
                 , sgPoint2 :: Point a
                 , sgPoint3 :: Point a
                 }
+
 
 instance Show a => Show (SolutionGen a) where
     show SolutionGen{..} =
@@ -69,13 +72,11 @@ predict Parameters{..} t
   | 9 <  t && t <= 26 = sqrt (pB / pK) * tan ((pC2 - sqrt (pK * pB) * t) / m)
   | otherwise = error "Invalid time!"
 
-
 combinations :: (Enum a, Num a, Eq a) => [SolutionGen a]
 combinations = zipWith (flip $ uncurry SolutionGen) (drop 10 points)
              $ filter (uncurry (/=))
              $ (\l -> [ (p1, p2) | p1 <- l, p2 <- l ])
              $ take 10 points
-
 
 instance M.ModelParams Parameters where
     type SolutionGen Parameters = SolutionGen

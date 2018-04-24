@@ -3,11 +3,14 @@
 
 module Solution.Second (Parameters, SolutionGen) where
 
+
 import           Data.Proxy
 
 import           AutoDiff
 import           GivenData
 import qualified Solution.Model as M
+
+
 
 data Parameters a =
     Parameters { pLambda :: a
@@ -28,15 +31,13 @@ instance Show a => Show (SolutionGen a) where
          ", p1 = (" ++ show (pTime sgPoint1) ++ ", " ++ show (pSpeed sgPoint1) ++ ")"
       ++ ", p2 = (" ++ show (pTime sgPoint2) ++ ", " ++ show (pSpeed sgPoint2) ++ ")"
 
-
 instance Show a => Show (Parameters a) where
     show Parameters{..} = "lambda = " ++ show pLambda
                          ++ ", c3 = " ++ show pC3
                          ++  ", K = " ++ show pK
                          ++  ", W = " ++ show pW
                          ++ ", c4 = " ++ show pC4
-                         ++ show pGen
-                         ++ "\n"
+                         ++ show pGen ++ "\n"
 
 c3F :: Floating a => Point a -> Point a -> a -> a
 c3F (Point t1 v1) (Point t2 v2) lambda =

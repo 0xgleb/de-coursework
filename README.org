@@ -88,6 +88,8 @@ The image below shows a chart of the original data.
 - *Braking force starts working instantly*. This assumption makes acceleration not continuous and simplifies the calculations.
 - *There is no wind*. This allows us to assume that if the plane is not moving then there is no air resistance.
 
+\newpage
+
 ** Derivation of the initial model
 
 #+CAPTION: Forces diagram
@@ -184,6 +186,8 @@ Now I can use programming to find the parameters. To do this I wrote 5 modules i
 The second module contains the given data.
 
 #+INCLUDE: "./optimizer/src/GivenData.hs" src haskell
+
+\newpage
 
 Then I defined a general interface for models.
 
@@ -331,11 +335,12 @@ Here is the result. It shows the best and the worst parameters found using the d
 
 
 #+ATTR_LATEX: :align |c|c|c|
-|---------------------+---------------------+---------------------|
-|       Maximum Error |       Average Error |    Root mean square |
-|---------------------+---------------------+---------------------|
-| 0.47598886269637575 | 0.23822424753496707 | 0.05344098631088544 |
-|---------------------+---------------------+---------------------|
+|---------------------+---------------------+--------------------|
+|       Maximum Error |       Average Error |   Root mean square |
+|---------------------+---------------------+--------------------|
+| 0.47598886269637575 | 0.23822424753496707 | 0.2776875104911393 |
+|---------------------+---------------------+--------------------|
+
 
 I'll now look at the two configurations that I obtained and plot them. The red line shows the worst configuration, and the purple line shows the best configuration.
 
@@ -371,8 +376,14 @@ The aeroplane fully stops in approximately $1060$ meters after touchdown, hence 
 
 * Model 2
 ** Redefining f(v)
+
+Although the first model fits the given data very well, I think this model can be improved. This time I will add a linear term to the air resistance function.
+
+$$ f(v) = k v^2 + \lambda v $$
+$$ \Rightarrow m\dot{v} = \begin{cases} - kv^2 - \lambda v, & 0 \leq t \leq 9 \\ - kv^2 - \lambda v - B, & 9 \leq t \leq 26 \end{cases} $$
+
 ** General solution
-*** 0 \leq t < 9
+*** 0 \leq t \leq 9
 
 $$ m\dot{v} = -kv^2 - \lambda v $$
 $$ \Rightarrow m\int \frac{1}{kv^2 + \lambda v} dv = -t + c_3 $$
@@ -389,7 +400,7 @@ $$ \Rightarrow v = k e^{\frac{\lambda}{m} (c_3 - t)} v + \lambda e^{\frac{\lambd
 $$ v = \frac{\lambda e^{\frac{\lambda}{m} (c_3 - t)}}{1 - k e^{\frac{\lambda}{m} (c_3 - t)}} $$
 $$ v = \frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{\frac{\lambda}{m} t} - ke^{\frac{\lambda}{m}c_3}} $$
 
-*** 9 < t \leq 26
+*** 9 \leq t \leq 26
 
 $$ m\dot{v} = -kv^2 - \lambda v - W $$
 $$ \Rightarrow m\int \frac{1}{kv^2 + \lambda v + W} dv = -\int dt $$
@@ -407,7 +418,7 @@ $$ \Rightarrow v = \begin{cases}\frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{\fra
 ** Particular solution
 
 $$ \Rightarrow \begin{cases}\frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{9\frac{\lambda}{m}} - ke^{\frac{\lambda}{m}c_3}} = 55 \\ \frac{\sqrt{4kW - \lambda^2}\tan(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - 9)) - \lambda}{2k} = 55 \end{cases} $$
-$$ \mbox{Let } (t_1, v_1), (t_2, v_2) \in S; t_1, t_2 \in [0, 9]; t_1 > t_2 $$
+$$ \mbox{Let } (t_1, v_1), (t_2, v_2) \in S; t_1, t_2 \in [0, 9]; t_1 \neq t_2 $$
 $$ \frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{t_1\frac{\lambda}{m}} - ke^{\frac{\lambda}{m}c_3}} = v_1 $$
 $$ \Rightarrow v_1ke^{\frac{\lambda}{m}c_3} = v_1e^{t_1\frac{\lambda}{m}} - \lambda e^{\frac{\lambda}{m} c_3} $$
 $$ \Rightarrow k = \frac{v_1e^{t_1\frac{\lambda}{m}} - \lambda e^{\frac{\lambda}{m} c_3}}{v_1e^{\frac{\lambda}{m}c_3}} $$
@@ -422,14 +433,11 @@ $$ \Rightarrow v_2 e^{\frac{\lambda}{m}(t_1 - t_2)} - (v_2\frac{\lambda}{v_1} - 
 $$ \Rightarrow e^{\frac{\lambda}{m}(c_3 - t_2)} = \frac{v_1v_2}{\lambda(v_2 - v_1)} (e^{\frac{\lambda}{m}(t_1 - t_2)} - 1) $$
 $$ \Rightarrow e^{\frac{\lambda}{m}c_3} = \frac{v_1v_2}{\lambda(v_2 - v_1)} (e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2}) $$
 $$ \Rightarrow c_3 = \frac{m}{\lambda}\ln(\frac{v_1v_2(e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2})}{\lambda(v_2 - v_1)}) $$
-$$ \frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{9\frac{\lambda}{m}} - ke^{\frac{\lambda}{m}c_3}} = 55 $$
-$$ \Rightarrow 55ke^{\frac{\lambda}{m}c_3} = 55e^{9\frac{\lambda}{m}} - \lambda e^{\frac{\lambda}{m} c_3} $$
-$$ \Rightarrow k = \frac{55e^{9\frac{\lambda}{m}} - \lambda e^{\frac{\lambda}{m} c_3}}{55e^{\frac{\lambda}{m}c_3}} $$
-$$ \Rightarrow k = e^{\frac{\lambda}{m}(9 - c_3)} - \frac{\lambda}{55} $$
+$$ \Rightarrow k = e^{\frac{\lambda}{m}(9 - c_3)} - \frac{\lambda}{55} \mbox{ (to make } v \mbox{ continuous)} $$
 $$ \hat{v} = \frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{\frac{\lambda}{m} t} - ke^{\frac{\lambda}{m}c_3}} $$
 $$ J = \sum_{(t,v) \in S, t \leq 9} (\hat{v} - v)^2 $$
 
-$J$ is a sum of squares of all errors for $t \leq 9$. We want to minimize this error, so I will set it partial derivative to zero to find the value of $\lambda$ that minimizes $J$.
+$J$ is a sum of squares of all errors for $t \leq 9$. We want to minimize this sum, so I will set its partial derivative to zero to find the value of $\lambda$ that minimizes $J$.
 
 $$ \mbox{Let } \zeta(\lambda) = \frac{\partial J}{\partial \lambda} = 0 $$
 $$ \Rightarrow \zeta(\lambda) = \partial_{\lambda}\sum_{(t,v) \in S, t \leq 9} (\hat{v} - v)^2 $$
@@ -442,20 +450,27 @@ $$ \frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t) = \arctan(\frac{2kv + \lambda}{\sqrt
 $$ \Rightarrow \frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t) - \arctan(\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}}) = 0 $$
 $$ I = \sum_{(t,v) \in S, t \geq 9} \left(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t) - \arctan(\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}})\right)^2 $$
 
-We want to find minimum of $I$.
+We want to minimize $I$.
 
 $$ \mbox{Let } \phi(W) = \frac{\partial I}{\partial W} = 0 $$
 $$ \Rightarrow \phi(W) = \partial_W \sum_{(t,v) \in S, t \geq 9} \left(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t) - \arctan(\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}})\right)^2 $$
 $$ \Rightarrow W_{n+1} = W_n - \frac{\phi(W)}{\phi'(W)} $$
+
+ I found $\lambda_0$ and $W_0$ the same way I found $B_0$ for the first model - I made a graph and adjusted parameters $c_3$, $\lambda$, and $W$ until the curve roughly fit the data.
+
+[[./img/not_optimized_second_model.png]]
+
 \begin{equation}
   \begin{cases}
     c_3 = \frac{m}{\lambda}\ln(\frac{v_1v_2(e^{\frac{\lambda}{m}t_1} - e^{\frac{\lambda}{m}t_2})}{\lambda(v_2 - v_1)}) \\
     k = e^{\frac{\lambda}{m}(9 - c_3)} - \frac{\lambda}{55} \\
     \zeta(\lambda) = \partial_{\lambda}\sum_{(t,v) \in S, t \leq 9} (\frac{\lambda e^{\frac{\lambda}{m} c_3}}{e^{\frac{\lambda}{m} t} - ke^{\frac{\lambda}{m}c_3}} - v)^2 \\
     \lambda_{n+1} = \lambda_n - \frac{\zeta(\lambda_n)}{\zeta'(\lambda_n)} \\
+    \lambda_0 = 921.7 \\
     c_4 = 9 + \frac{2m\arctan(\frac{110k + \lambda}{\sqrt{4kW - \lambda^2}})}{\sqrt{4kW-\lambda^2}} \\
     \phi(W) = \partial_W \sum_{(t,v) \in S, t \geq 9} \left(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - t) - \arctan(\frac{2kv + \lambda}{\sqrt{4kW - \lambda^2}})\right)^2 \\
-    W_{n+1} = W_n - \frac{\phi(W)}{\phi'(W)}
+    W_{n+1} = W_n - \frac{\phi(W)}{\phi'(W)} \\
+    W_0 = 290000
   \end{cases}
 \end{equation}
 
@@ -463,7 +478,7 @@ I wrote another module for the second model:
 
 #+INCLUDE: "./optimizer/src/Solution/Second.hs" src haskell
 
-I also changed ~import Solution.First as Sol~ to ~import Solution.Second as Sol~ in the main module. This code gives us the following result.
+I also changed ~import Solution.First as Sol~ to ~import Solution.Second as Sol~ in the main module. This code gives us the following result:
 
 #+NAME: second_model_code_result
 [[./img/second_model_code_result.png]]
@@ -532,11 +547,11 @@ I also changed ~import Solution.First as Sol~ to ~import Solution.Second as Sol~
 |------+---------------------+-----------+----------|
 
 #+ATTR_LATEX: :align |c|c|c|
-|--------------------+---------------------+--------------------|
-|      Maximum Error |       Average Error |   Root mean square |
-|--------------------+---------------------+--------------------|
-| 0.4558837377913889 | 0.23458170693637476 | 0.0525613462052476 |
-|--------------------+---------------------+--------------------|
+|--------------------+---------------------+---------------------|
+|      Maximum Error |       Average Error |    Root mean square |
+|--------------------+---------------------+---------------------|
+| 0.4558837377913889 | 0.23458170693637476 | 0.27311676642511934 |
+|--------------------+---------------------+---------------------|
 
 I'll now look at the two configurations that I obtained and plot them. The red line shows the worst configuration, and the green line shows the best configuration.
 
@@ -572,7 +587,18 @@ $$ \Rightarrow x = \frac{1}{k} \left(\left[m\ln(e^{\frac{\lambda}{m}(t - c_3)} -
 $$ \Rightarrow x = \frac{m}{k} (\ln\left(\frac{e^{\frac{\lambda}{m}(9 - c_3)} - k}{e^{\frac{\lambda}{m}(- c_3)} - k}\right) + \ln\left(\frac{\cos(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - 26))}{\cos(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - 9))}\right)) - 17.5\frac{\lambda}{k} $$
 $$ \Rightarrow x = \frac{m}{k} \ln\left(\frac{e^{\frac{\lambda}{m}(9 - c_3)} - k}{e^{\frac{\lambda}{m}(- c_3)} - k} \times \frac{\cos(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - 26))}{\cos(\frac{\sqrt{4kW-\lambda^2}}{2m}(c_4 - 9))}\right) - 17.5\frac{\lambda}{k} $$
 
+[[./img/second_model_integral.png]]
+
+$$ \Rightarrow x \approx 1057.8652498929307 \approx 1060 $$
+
+As you can see the value of $x$ is approximately equal to the one found from the first model, so recommendations are the same.
+
 * Assessment of the improvement obtained
+** Prediction
+
+Based on the models I predict that the aeroplane stopped in $1060$ meters. The length of runway that I recommend is $2000$ meters for the reasons stated in the work.
+
+** Comparing the models
 
 #+ATTR_LATEX: :align |c|r|r|l|c|
 |------+--------------------+---------------------+----------+--------|
@@ -640,13 +666,13 @@ $$ \Rightarrow x = \frac{m}{k} \ln\left(\frac{e^{\frac{\lambda}{m}(9 - c_3)} - k
 | Model |       Maximum Error |       Average Error |    Root mean square | Num. of better |
 |       |                     |                     |                     |    predictions |
 |-------+---------------------+---------------------+---------------------+----------------|
-| 1st   | 0.47598886269637575 | 0.23822424753496707 | 0.05344098631088544 |             12 |
+| 1st   | 0.47598886269637575 | 0.23822424753496707 |  0.2776875104911393 |             12 |
 |-------+---------------------+---------------------+---------------------+----------------|
-| 2nd   |  0.4558837377913889 | 0.23458170693637476 |  0.0525613462052476 |             15 |
+| 2nd   |  0.4558837377913889 | 0.23458170693637476 | 0.27311676642511934 |             15 |
 |-------+---------------------+---------------------+---------------------+----------------|
 
-Here is a graph of both of the models.
+Here is a graph of both of the models. The purple line is the first model and the green line is the second one.
 
 [[./img/comparison_graph.png]]
 
-As you can see the second model gave more accurate predictions, but the increase in accuracy is very small.
+The curves are so close to each other that at this scale you can't even see the difference. The second model gave more accurate predictions, but the increase in accuracy is very small and the increase in complexity and computation time are significant.
