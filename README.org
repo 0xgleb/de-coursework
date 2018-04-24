@@ -13,7 +13,7 @@
     \line(1,0){300} \\
     [5mm]
     \huge{\bfseries Differential Equations Coursework} \\
-    \huge{\bfseries Aeroplane Landing Modelling} \\
+    \huge{Aeroplane Landing Modelling} \\
     [5mm]
     \huge{Gleb Dianov} \\
   \end{center}
@@ -675,4 +675,4 @@ Here is a graph of both of the models. The purple line is the first model and th
 
 [[./img/comparison_graph.png]]
 
-The curves are so close to each other that at this scale you can't even see the difference. The second model gave more accurate predictions, but the increase in accuracy is very small and the increase in complexity and computation time are significant.
+The curves are so close to each other that at this scale you can't even see the difference. The second model gave more accurate predictions, but the increase in accuracy is very small and the increases in complexity and computation time are significant.
